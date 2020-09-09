@@ -8,8 +8,6 @@ Mike Mirzayanov's blog entries:
  
 """
 
-from sys import stdout
-
 import requests
 from docopt import docopt
 
@@ -123,17 +121,13 @@ def main(contestid, points, penalty, old_rating):
     log("Calculating rating changes...")
     results = calculate_rating_changes(prev_ratings_dict, updated_standings)
 
-    for k, v in results.items():
-        print(str(k) + " -> " + str(v))
-
     return results[VIRTUAL_USER_PARTY]
 
 
 if __name__ == "__main__":
     command_doc = """Codeforces Virtual Rating Calculator.
 
-    Calculates your rating change in a Codeforces virtual contest and outputs it
-    to stdout.
+    Calculates and prints your rating change in a Codeforces virtual contest.
 
     Usage:
       cf-rating-calc.py <contestId> <points> <penalty> <oldRating>
@@ -155,4 +149,4 @@ if __name__ == "__main__":
     old_rating = int(arguments["<oldRating>"])
 
     delta = main(contestid, points, penalty, old_rating)
-    stdout.write(str(delta))
+    print(delta)
