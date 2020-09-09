@@ -155,4 +155,4 @@ if __name__ == "__main__":
     old_rating = int(arguments["<oldRating>"])
 
     delta = main(contestid, points, penalty, old_rating)
-    stdout.write(delta)
+    stdout.write(str(delta))
