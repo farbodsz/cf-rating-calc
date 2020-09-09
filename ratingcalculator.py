@@ -7,7 +7,6 @@ See https://codeforces.com/contest/1/submission/13861109
 import math
 
 from datamodels import Party
-
 from util import log
 
 
@@ -26,6 +25,10 @@ class Contestant:
         self.rank = rank
         self.points = points
         self.rating = previous_rating
+
+        self.seed = 0
+        self.need_rating = 0
+        self.delta = 0
 
 
 def validate_deltas(contestants):
@@ -92,10 +95,6 @@ def sort_by_rating_desc(contestants):
 
 def reassign_ranks(contestants):
     sort_by_points_desc(contestants)
-
-    for contestant in contestants:
-        contestant.rank = 0
-        contestant.delta = 0
 
     first = 0
     points = contestants[0].points
