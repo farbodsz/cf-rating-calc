@@ -106,18 +106,18 @@ def main(contestid, points, penalty, old_rating):
     Returns:
       an integer, delta, the virtual user's rating change
     """
-    prev_ratings_dict = {}
+    prev_ratings_dict = {}  # user handles -> old ratings
 
     log("Fetching rating changes for contest...")
     for change in fetch_rating_changes(contestid):
         prev_ratings_dict[change.handle] = change.old_rating
 
     # Add virtual user
-    log("Fetching contest standings...")
     prev_ratings_dict[VIRTUAL_USER_PARTY.handles[0]] = old_rating
-    updated_standings = add_vusr_to_standings(
-        fetch_standings(contestid), points, penalty
-    )
+
+    log("Fetching contest standings...")
+    standings = fetch_standings(contestid)
+    updated_standings = add_vusr_to_standings(standings, points, penalty)
 
     # Create a dict of rating changes
     log("Calculating rating changes...")
