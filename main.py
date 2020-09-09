@@ -8,7 +8,7 @@ Mike Mirzayanov's blog entries:
  
 """
 
-from sys import stderr, stdout
+from sys import stdout
 
 import requests
 from docopt import docopt
@@ -20,6 +20,7 @@ from datamodels import (
     deserialize_standings_row,
 )
 from ratingcalculator import calculate_rating_changes
+from util import log
 
 CODEFORCES_API_STANDINGS = "https://codeforces.com/api/contest.standings"
 CODEFORCES_API_RATING_CHANGES = (
@@ -35,7 +36,7 @@ def fetch_rating_changes(contestid):
         CODEFORCES_API_RATING_CHANGES, {"contestId": contestid}
     ).json()
     if r["status"] != "OK":
-        stderr.write("Failed to retrieve rating changes.")
+        log("Failed to retrieve rating changes.")
         return
 
     data = r["result"]
@@ -50,7 +51,7 @@ def fetch_standings(contestid):
     """Gets a list of StandingsRow objects for the contest with contestid."""
     r = requests.get(CODEFORCES_API_STANDINGS, {"contestId": contestid}).json()
     if r["status"] != "OK":
-        stderr.write("Failed to retrieve contest standings.")
+        log("Failed to retrieve contest standings.")
         return
 
     data = r["result"]["rows"]
@@ -102,20 +103,24 @@ def main(contestid, points, penalty, old_rating):
       an integer, delta, the virtual user's rating change
     """
     prev_ratings_dict = {}
+
+    log("Fetching rating changes for contest...")
     for change in fetch_rating_changes(contestid):
         prev_ratings_dict[change.handle] = change.old_rating
 
     # Add virtual user
+    log("Fetching contest standings...")
     prev_ratings_dict[VIRTUAL_USER_PARTY.handles[0]] = old_rating
     updated_standings = add_vusr_to_standings(
         fetch_standings(contestid), points, penalty
     )
 
     # Create a dict of rating changes
+    log("Calculating rating changes...")
     results = calculate_rating_changes(prev_ratings_dict, updated_standings)
 
-    for k,v in results.items():
-        print(str(k) + " -> " + str(v)) 
+    for k, v in results.items():
+        print(str(k) + " -> " + str(v))
 
     return results[VIRTUAL_USER_PARTY]
 

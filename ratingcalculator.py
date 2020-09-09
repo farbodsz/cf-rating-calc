@@ -8,6 +8,8 @@ import math
 
 from datamodels import Party
 
+from util import log
+
 
 class Contestant:
     party: Party
@@ -115,6 +117,7 @@ def process(contestants):
     if not contestants:
         return
 
+    log("Reassigning ranks...")
     reassign_ranks(contestants)
 
     for a in contestants:
@@ -154,6 +157,7 @@ def process(contestants):
 
     adjust_sum()
 
+    log("Validating deltas...")
     validate_deltas(contestants)
 
 
@@ -173,6 +177,7 @@ def calculate_rating_changes(previous_ratings, standings):
     contestants = []
 
     # Construct list of Contestants
+    log("Constructing list of contestants...")
     for row in standings:
         rank = row.rank
         party = row.party
