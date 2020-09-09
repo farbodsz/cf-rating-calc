@@ -101,7 +101,7 @@ def reassign_ranks(contestants):
     points = contestants[0].points
 
     for i in range(1, len(contestants)):
-        if contestants[0].points < points:
+        if contestants[i].points < points:
             for j in range(first, i):
                 contestants[j].rank = i
             first = i
