@@ -90,7 +90,7 @@ def add_vusr_to_standings(standings, vusr_points, vusr_penalty):
             vusr_standing = StandingsRow(
                 VIRTUAL_USER_PARTY, row.rank, vusr_points, vusr_penalty,
             )
-            updated_standings.append(row)
+            updated_standings.append(vusr_standing)
             inserted_vusr = True
         updated_standings.append(row)
 
