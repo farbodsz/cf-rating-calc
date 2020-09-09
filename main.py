@@ -30,6 +30,7 @@ VIRTUAL_USER_PARTY = Party(("{VIRTUAL_USR}",))
 
 def fetch_rating_changes(contestid):
     """Gets a list of RatingChange objects for the contest with contestid."""
+    log("Fetching rating changes for contest...")
     r = requests.get(
         CODEFORCES_API_RATING_CHANGES, {"contestId": contestid}
     ).json()
@@ -47,6 +48,7 @@ def fetch_rating_changes(contestid):
 
 def fetch_standings(contestid):
     """Gets a list of StandingsRow objects for the contest with contestid."""
+    log("Fetching contest standings...")
     r = requests.get(CODEFORCES_API_STANDINGS, {"contestId": contestid}).json()
     if r["status"] != "OK":
         log("Failed to retrieve contest standings.")
@@ -106,19 +108,16 @@ def main(contestid, points, penalty, old_rating):
     """
     prev_ratings_dict = {}  # user handles -> old ratings
 
-    log("Fetching rating changes for contest...")
     for change in fetch_rating_changes(contestid):
         prev_ratings_dict[change.handle] = change.old_rating
 
     # Add virtual user
     prev_ratings_dict[VIRTUAL_USER_PARTY.handles[0]] = old_rating
 
-    log("Fetching contest standings...")
     standings = fetch_standings(contestid)
     updated_standings = add_vusr_to_standings(standings, points, penalty)
 
     # Create a dict of rating changes
-    log("Calculating rating changes...")
     results = calculate_rating_changes(prev_ratings_dict, updated_standings)
 
     return results[VIRTUAL_USER_PARTY]

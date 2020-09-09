@@ -92,13 +92,11 @@ def process(contestants):
     if not contestants:
         return
 
-    log("Reassigning ranks...")
     reassign_ranks(contestants)
 
     # Caches the calculated seed for a given rating
     seed_cache = {}
 
-    log("Calculating deltas...")
     for contestant in contestants:
         rating = contestant.rating
         contestant.seed = get_seed(contestants, rating, seed_cache) - 0.5
@@ -153,7 +151,7 @@ def calculate_rating_changes(previous_ratings, standings):
     contestants = []
 
     # Construct list of Contestants
-    log(f"Constructing list of {len(standings)} contestants...")
+    log(f"Calculating rating changes for {len(standings)} contestants...")
     for row in standings:
         rank = row.rank
         party = row.party
