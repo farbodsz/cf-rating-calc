@@ -31,35 +31,6 @@ class Contestant:
         self.delta = 0
 
 
-def validate_deltas(contestants):
-    """Compares deltas of all pairs of contestants, raising an exception if
-    invalid."""
-    sort_by_points_desc(contestants)
-
-    def ensure(expr, is_first_rating, party1, party2):
-        """Raises an exception if expr is false. The error message is generated
-        from the remaining parameters."""
-        if not expr:
-            num = "First" if is_first_rating else "Second"
-            msg = f"{num} rating invariant failed: {party1} vs {party2}."
-            raise Exception(msg)
-
-    for i in range(len(contestants)):
-        for j in range(i + 1, len(contestants)):
-            if contestants[i].rating > contestants[j].rating:
-                check = (
-                    contestants[i].rating + contestants[i].delta
-                    >= contestants[j].rating + contestants[j].delta
-                )
-                ensure(check, True, contestants[i].party, contestants[j].party)
-
-            if contestants[i].rating < contestants[j].rating:
-                if contestants[i].delta < contestants[j].delta:
-                    print(1)  # TODO why
-                check = contestants[i].delta >= contestants[j].delta
-                ensure(check, False, contestants[i].party, contestants[j].party)
-
-
 def get_seed(contestants, rating, seed_cache):
     """Returns a float."""
     if rating in seed_cache:
@@ -138,6 +109,7 @@ def process(contestants):
         contestant.delta = (contestant.need_rating - rating) // 2
 
     sort_by_rating_desc(contestants)
+
     log("Adjusting sums...")
 
     # Total sum should not be more than zero
@@ -163,9 +135,6 @@ def process(contestants):
             c.delta += inc
 
     adjust_sum()
-
-    log("Validating deltas...")
-    validate_deltas(contestants)
 
 
 def calculate_rating_changes(previous_ratings, standings):
