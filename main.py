@@ -75,8 +75,11 @@ def add_vusr_to_standings(standings, vusr_points, vusr_penalty):
       the updated list of standings (StandingsRow instances)
     """
     updated_standings = []
+    inserted_vusr = False
 
     def should_insert_vusr(curr):
+        if inserted_vusr:
+            return False
         if vusr_points == curr.points:
             return penalty <= curr.penalty
         else:
@@ -88,6 +91,7 @@ def add_vusr_to_standings(standings, vusr_points, vusr_penalty):
                 VIRTUAL_USER_PARTY, row.rank, vusr_points, vusr_penalty,
             )
             updated_standings.append(row)
+            inserted_vusr = True
         updated_standings.append(row)
 
     return updated_standings
