@@ -124,27 +124,22 @@ def process(contestants):
     log("Reassigning ranks...")
     reassign_ranks(contestants)
 
-    log("Calculating seeds...")
-    for a in contestants:
-        a.seed = 1
-        for b in contestants:
-            if not a == b:
-                a.seed += get_elo_win_probability(b.rating, a.rating)
-
     # Caches the calculated seed for a given rating
     seed_cache = {}
 
-    log("Calculating ranks, ratings and deltas...")
+    log("Calculating deltas...")
     for contestant in contestants:
+        rating = contestant.rating
+        contestant.seed = get_seed(contestants, rating, seed_cache) - 0.5
         mid_rank = math.sqrt(contestant.rank * contestant.seed)
         contestant.need_rating = get_rating_to_rank(
             contestants, mid_rank, seed_cache
         )
-        contestant.delta = (contestant.need_rating - contestant.rating) // 2
+        contestant.delta = (contestant.need_rating - rating) // 2
 
     sort_by_rating_desc(contestants)
+    log("Adjusting sums...")
 
-    log("Adjusting sums (1)...")
     # Total sum should not be more than zero
     def total_sum_not_more_than_zero():
         sum = 0
@@ -156,7 +151,6 @@ def process(contestants):
 
     total_sum_not_more_than_zero()
 
-    log("Adjusting sums (2)...")
     # Sum of top-4*sqrt should be adjusted to zero
     def adjust_sum():
         sum = 0
