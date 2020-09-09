@@ -60,21 +60,25 @@ def validate_deltas(contestants):
                 ensure(check, False, contestants[i].party, contestants[j].party)
 
 
-def get_seed(contestants, rating):
+def get_seed(contestants, rating, seed_cache):
     """Returns a float."""
+    if rating in seed_cache:
+        return seed_cache[rating]
+
     extra = Contestant(None, 0, 0, rating)
     result = 1.0
     for other in contestants:
         result += get_elo_win_probability(other.rating, extra.rating)
+    seed_cache[rating] = result
     return result
 
 
-def get_rating_to_rank(contestants, rank):
+def get_rating_to_rank(contestants, rank, seed_cache):
     left = 1
     right = 8000
     while right - left > 1:
         mid = (left + right) // 2
-        if get_seed(contestants, mid) < rank:
+        if get_seed(contestants, mid, seed_cache) < rank:
             right = mid
         else:
             left = mid
@@ -127,10 +131,15 @@ def process(contestants):
             if not a == b:
                 a.seed += get_elo_win_probability(b.rating, a.rating)
 
+    # Caches the calculated seed for a given rating
+    seed_cache = {}
+
     log("Calculating ranks, ratings and deltas...")
     for contestant in contestants:
         mid_rank = math.sqrt(contestant.rank * contestant.seed)
-        contestant.need_rating = get_rating_to_rank(contestants, mid_rank)
+        contestant.need_rating = get_rating_to_rank(
+            contestants, mid_rank, seed_cache
+        )
         contestant.delta = (contestant.need_rating - contestant.rating) // 2
 
     sort_by_rating_desc(contestants)
