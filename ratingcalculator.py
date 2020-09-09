@@ -16,7 +16,7 @@ class Contestant:
     points: int
     rating: int  # previous rating
 
-    seed: int
+    seed: float
     need_rating: int
     delta: int
 
@@ -26,7 +26,7 @@ class Contestant:
         self.points = points
         self.rating = previous_rating
 
-        self.seed = 0
+        self.seed = 0.0
         self.need_rating = 0
         self.delta = 0
 
@@ -61,6 +61,7 @@ def validate_deltas(contestants):
 
 
 def get_seed(contestants, rating):
+    """Returns a float."""
     extra = Contestant(None, 0, 0, rating)
     result = 1.0
     for other in contestants:
@@ -72,7 +73,7 @@ def get_rating_to_rank(contestants, rank):
     left = 1
     right = 8000
     while right - left > 1:
-        mid = (left + right) / 2
+        mid = (left + right) // 2
         if get_seed(contestants, mid) < rank:
             right = mid
         else:
@@ -81,8 +82,8 @@ def get_rating_to_rank(contestants, rank):
 
 
 def get_elo_win_probability(ra, rb):
-    """Returns the Elo win probability with on the given ratings ra and rb."""
-    return 1.0 / (1 + math.pow(10, (rb - ra) / 400.0))
+    """Returns the Elo win probability (float) with the given ratings ra, rb."""
+    return 1.0 / (1.0 + math.pow(10, (rb - ra) / 400.0))
 
 
 def sort_by_points_desc(contestants):
@@ -128,7 +129,7 @@ def process(contestants):
     for contestant in contestants:
         mid_rank = math.sqrt(contestant.rank * contestant.seed)
         contestant.need_rating = get_rating_to_rank(contestants, mid_rank)
-        contestant.delta = (contestant.need_rating - contestant.rating) / 2
+        contestant.delta = (contestant.need_rating - contestant.rating) // 2
 
     sort_by_rating_desc(contestants)
 
@@ -137,7 +138,7 @@ def process(contestants):
         sum = 0
         for c in contestants:
             sum += c.delta
-        inc = -sum / len(contestants) - 1
+        inc = -sum // len(contestants) - 1
         for c in contestants:
             c.delta += inc
 
@@ -150,7 +151,7 @@ def process(contestants):
         zero_sum_count = min(calc, len(contestants))
         for i in range(zero_sum_count):
             sum += contestants[i].delta
-        inc = min(0, max(-sum / zero_sum_count, -10))
+        inc = min(0, max(-sum // zero_sum_count, -10))
         for c in contestants:
             c.delta += inc
 
